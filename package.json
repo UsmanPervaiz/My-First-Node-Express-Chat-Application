@@ -1,0 +1,16 @@
+{
+  "name": "socket-io-chat-node",
+  "version": "1.0.0",
+  "description": "Build a real-time chat application using socket.io, Node.js and Express.",
+  "main": "app/app.js",
+  "scripts": {
+  	"start": "nodemon app/app.js"
+  },
+  "author": "Usman Pervaiz",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "reload": "^2.2.2",
+    "socket.io": "^2.0.4"
+  }
+}
