@@ -4,11 +4,12 @@
   "description": "Build a real-time chat application using socket.io, Node.js and Express.",
   "main": "app/app.js",
   "scripts": {
-  	"start": "nodemon app/app.js"
+    "start": "nodemon -e ejs,js,json --watch app"
   },
   "author": "Usman Pervaiz",
   "license": "ISC",
   "dependencies": {
+    "ejs": "^2.5.7",
     "express": "^4.16.2",
     "reload": "^2.2.2",
     "socket.io": "^2.0.4"

@@ -3,8 +3,9 @@ var router = express.Router();
 var path = require('path');
 
 router.get("/", function(req, res) {
-	console.log(path.join(__dirname, '../index.html'))
-  res.sendFile(path.join(__dirname, '../index.html'));
+res.render("index")
+
+  // res.sendFile(path.join(__dirname, '../index.html'));
   //Note: __dirname returns the directory that the currently 
   //executing script is in. In our case, the "index.html" file is in
   //"app" directory, which is the parent directory of the parent of
@@ -13,4 +14,4 @@ router.get("/", function(req, res) {
 });
 
 
-module.exports = router;
+module.exports = router; 

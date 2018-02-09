@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+   
+    <% include partials/headDefaults.ejs %>
+
+    <title>Hello, world!</title>
+    <style>
+
+      body{
+        margin-top:30px;    
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="userRegistrationDiv" class="row">
+        <div class="col-md-10">
+          <form id="userRegistrationForm">
+            <div class="form-group">
+              <label>Enter Username</label>
+              <input class="form-control" id="username" required></input>
+              <br />
+              <input type="submit" class="btn btn-primary" value="Login" />
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="messageArea" class="row" hidden>
+        <div class="col-md-4">
+          <div class="well">
+            <h3>Online Users</h3>
+            <ul class="list-group" id="users"></ul>
+          </div>  
+        </div>
+        <div class="col-md-8">
+          <div class="chat" id="chat"></div>
+
+          <form id="messageForm">
+            <div class="form-group">
+              <textarea class="form-control" id="message" required placeholder="Enter Message"></textarea>
+              <br />
+              <input type="submit" class="btn btn-primary" value="Send Message" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <% include partials/bodyDefaultScripts.ejs %>
+    <!-- Includes are relative to the template with the include call. Since "index.ejs and "partials" are in the same parent
+    directory (relative path), we just write "partials/bodyDefaultScript.ejs". -->
+
+
+  </body>
+</html>

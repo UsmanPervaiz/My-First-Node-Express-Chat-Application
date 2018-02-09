@@ -1,0 +1,64 @@
+ <!-- Optional JavaScript -->
+ <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+ <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+ <script src="/socket.io/socket.io.js"></script>
+ <script src="/reload/reload.js"></script>
+
+ <script>
+ 	$(function() {
+ 		var socket = io.connect();
+
+ 		let $userRegistrationDiv = $("#userRegistrationDiv");
+ 		let $userRegistrationForm = $("#userRegistrationForm");
+ 		let $username = $("#username");
+ 		let $onlineUsers = $("#users");
+ 		let $messageArea = $("#messageArea");
+ 		let $messageForm = $("#messageForm");
+ 		let $message = $("#message");
+ 		let $chat = $("#chat");
+ 		
+ 		socket.on("new message", function(data) {	
+ 			// $chat.append('<div class="well"><strong>'+data.username+": </strong>"+data.msg+'</div>');
+ 			let newMessage = document.createElement("p");
+ 			if(socket.username === data.username) {
+ 				newMessage.className = 'bg-success chat-text';
+ 			} else {
+    			newMessage.className = 'bg-info text-warning chat-text';
+  			}
+ 			newMessage.innerHTML = '<strong>' + data.username + '</strong>: ' + data.msg;
+ 			$chat.append(newMessage);
+ 			$message.focus();
+ 		});
+
+ 		socket.on("update usernames", function(data) {
+ 			//data = array or usernames passed from the server.
+ 			let html = "";
+ 			data.forEach(function(username) {
+ 				html += '<li class="list-group-item">'+username+'</li>';
+ 			})
+ 			$onlineUsers.html(html);
+ 		})
+
+ 		$messageForm.submit(function(e) {
+ 			e.preventDefault();
+ 			if($message.val()) {
+ 				socket.emit("send message", $message.val())
+ 				$message.val("");
+ 			}
+ 		});
+
+ 		$userRegistrationForm.submit(function(e) {
+ 			e.preventDefault();
+ 			if($username.val()) {
+ 				socket.emit("new user", $username.val(), );
+ 				$username.val("");
+ 				$messageArea.removeAttr("hidden"); 				
+ 				$userRegistrationForm.hide();
+ 				console.log($messageArea)
+ 			}
+ 		});
+
+ 	});
+ </script>

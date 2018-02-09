@@ -1,11 +1,14 @@
 var express = require('express');
 var app = express();
+var reload = require('reload');
 var io = require('socket.io')();
 
 var users = [];
 var connections = [];
 
 app.set('port', process.env.PORT || 3000);
+app.set("view engine", "ejs");
+app.set("views", "app/views");
 
 app.use(require("./routes/index"));
 
@@ -15,8 +18,66 @@ var server = app.listen(app.get("port"), function() {
 
 io.attach(server)
 
+io.on('connection', function(socket) {
+	connections.push(socket);
+	console.log(socket.id, " connected")
+	console.log("Connected: %s sockets connected.", connections.length);
+
+	//Disconnect:
+
+	socket.on("disconnect", function(data) {
+		connections.splice(connections.indexOf(socket), 1);
+		users.splice(users.indexOf(socket.username), 1);
+		io.emit("update usernames", users);
+		console.log(socket.id, " disconnected")
+		console.log("Connected: %s sockets connected.", connections.length);
+	})
+
+	//Send Message:
+
+	socket.on("send message", function(data) {
+		io.emit("new message", {username: socket.username, msg: data})
+	});
+
+	//The user will use the message form in his browser to submit
+	//a new chat message. On the client side we will fire a submit
+	//event once the user hits enter/submit, in this submit event
+	//handler we will emit a "send message" event from that specific 
+	//user/socket.
+
+	//Now remember that every user that connects to our server gets
+	//a unique socket id, which means that every user gets their own
+	//private socket to emit and listen for events. Below we are attaching 
+	//an event listener called "new message" on every unique socket id.
+	//A user shares the same socket.id between the browser and
+	//the server, in other words, he is known by the same socket as
+	//long as he is connected to our server, when he disconnects and 
+	//reconnects, he gets a new unique socket.id every time.
+
+	//From the browser the user will emit a new event from his socket, 
+	//which will be caught on the server side by the same socket. 
+	//Below we are asking the socket to listen for an event called 
+	//"new message". Now when this event is caught on the server side,
+	//we will emit a new event, but this time we won't use the "socket"
+	//to emit, instead we will use "io.emit" so that every user or
+	//socket that is currently connected to our server/io can listen
+	//for this new event from the server. If we again use "socket.emit"
+	//we will simply be sending messages back and forth to the same 
+	//socket and other sockets connected to our server, will not be
+	//notified of new events.
 
 
+	//New User:
+
+	socket.on("new user", function(data) {
+		socket.username = data;
+		users.push(data);
+		io.emit("update usernames", users);
+	});
+
+});
+
+reload(app)
 
 
 //===================================================================
