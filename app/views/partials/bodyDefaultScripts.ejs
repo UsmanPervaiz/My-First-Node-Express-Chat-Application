@@ -24,17 +24,18 @@
  			$username.val("");
  		})
  		
- 		socket.on("new message", function(data) {	
- 			// $chat.append('<div class="well"><strong>'+data.username+": </strong>"+data.msg+'</div>');
- 			let newMessage = document.createElement("p");
- 			if(socket.username === data.username) {
- 				newMessage.className = 'bg-success chat-text';
- 			} else {
-    			newMessage.className = 'bg-info text-warning chat-text';
-  			}
- 			newMessage.innerHTML = '<strong>' + data.username + '</strong>: ' + data.msg;
- 			$chat.append(newMessage);
- 			$message.focus();
+ 		socket.on("new message", function(data) {
+ 			if(socket.username) {
+	 			let newMessage = document.createElement("p");
+	 			if(socket.username === data.username) {
+	 				newMessage.className = 'bg-success chat-text';
+	 			} else {
+	    			newMessage.className = 'bg-info text-warning chat-text';
+	  			}
+	 			newMessage.innerHTML = '<strong>' + data.username + '</strong>: ' + data.msg;
+	 			$chat.append(newMessage);
+	 			$message.focus();
+ 			}
  		});
 
  		socket.on("update usernames", function(data) {
@@ -66,17 +67,24 @@
  			// 		}
  			// 	})
  			// }
- 			e.preventDefault();
- 			
+ 			e.preventDefault();			
  			if($username.val()) {
  				function moveUserToChat() {
  					$username.val("");
  					$userRegistrationForm.hide();
  					$messageArea.removeAttr("hidden");
  				}
- 				socket.emit("new user", $username.val(), function(data) {
+ 				socket.emit("new user", $username.val(), function(data, username) {
  					if(data) {
- 						$username.val("");
+ 						socket.username = username;
+ 						//The socket in your browser and the socket in the server won't 
+ 						//share the same properties if you set them.
+ 						//If you set data only at the client side (which is in your 
+ 						//browsers memory NOT on the server), you cannot access it from
+ 						//the server.
+ 						//Keeping this in mind, I added the new property "username"
+ 						//to socket on both the server and the client/browser. The username
+ 						//here is being passed from the server to the client.
  						$userRegistrationForm.hide();
  						$messageArea.removeAttr("hidden");
  					}

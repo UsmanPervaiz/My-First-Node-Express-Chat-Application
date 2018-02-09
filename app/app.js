@@ -21,8 +21,7 @@ io.attach(server)
 
 io.on('connection', function(socket) {
 	connections.push(socket);
-	console.log(socket.id, " connected")
-	console.log("Connected: %s sockets connected.", connections.length);
+	console.log(socket.id, " connected. Total " + connections.length + " connections")
 
 	//Disconnect:
 
@@ -42,9 +41,11 @@ io.on('connection', function(socket) {
 			socket.emit("username exists")
 		} else {
 			socket.username = username;
+			//The socket in your browser and the socket in the server won't
+			//share the same properties if you set them.
 			users.push(username);
 			lowerCaseUsers.push(username.toLowerCase());
-			fn(true);
+			fn(true, socket.username);
 			io.emit("update usernames", users);
 		}
 	});
@@ -52,7 +53,7 @@ io.on('connection', function(socket) {
 	//Send Message:
 
 	socket.on("send message", function(data) {
-		io.emit("new message", {username: socket.username, msg: data})
+		io.emit("new message", {username: socket.username, msg: data, socketUsername: socket.username})
 	});
 
 	//The user will use the message form in his browser to submit
