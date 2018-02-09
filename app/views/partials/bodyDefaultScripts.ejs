@@ -18,6 +18,11 @@
  		let $messageForm = $("#messageForm");
  		let $message = $("#message");
  		let $chat = $("#chat");
+
+ 		socket.on("username exists", function(data) {
+ 			$username.attr("placeholder", `${$username.val()} already taken!`)
+ 			$username.val("");
+ 		})
  		
  		socket.on("new message", function(data) {	
  			// $chat.append('<div class="well"><strong>'+data.username+": </strong>"+data.msg+'</div>');
@@ -33,7 +38,7 @@
  		});
 
  		socket.on("update usernames", function(data) {
- 			//data = array or usernames passed from the server.
+ 			//data = array of usernames passed from the server.
  			let html = "";
  			data.forEach(function(username) {
  				html += '<li class="list-group-item">'+username+'</li>';
@@ -44,21 +49,48 @@
  		$messageForm.submit(function(e) {
  			e.preventDefault();
  			if($message.val()) {
- 				socket.emit("send message", $message.val())
- 				$message.val("");
+ 				socket.emit("send message", $message.val())			
+ 			}
+ 			$message.val("");
+ 		});
+
+ 		$userRegistrationForm.submit(function(e) {			
+ 			// let $alreadyLoggedInUsernames = $onlineUsers.children()
+ 			// console.log($alreadyLoggedInUsernames)			
+ 			// if($alreadyLoggedInUsernames.length) {
+ 			// 	$alreadyLoggedInUsernames.each(function(index, child) {
+ 			// 		if($username.val().toLowerCase() === $(child).html().toLowerCase()) {				
+ 			// 			$username.attr("placeholder", `${$username.val()} already taken!`)
+ 			// 			$username.val("");
+ 			// 			return
+ 			// 		}
+ 			// 	})
+ 			// }
+ 			e.preventDefault();
+ 			
+ 			if($username.val()) {
+ 				function moveUserToChat() {
+ 					$username.val("");
+ 					$userRegistrationForm.hide();
+ 					$messageArea.removeAttr("hidden");
+ 				}
+ 				socket.emit("new user", $username.val(), function(data) {
+ 					if(data) {
+ 						$username.val("");
+ 						$userRegistrationForm.hide();
+ 						$messageArea.removeAttr("hidden");
+ 					}
+ 				}
+				);
  			}
  		});
 
- 		$userRegistrationForm.submit(function(e) {
- 			e.preventDefault();
- 			if($username.val()) {
- 				socket.emit("new user", $username.val(), );
- 				$username.val("");
- 				$messageArea.removeAttr("hidden"); 				
- 				$userRegistrationForm.hide();
- 				console.log($messageArea)
+ 		$message.keydown(function(e) {
+ 			if(e.keyCode === 13) {
+ 				e.preventDefault();
+ 				$messageForm.trigger("submit")
  			}
- 		});
+ 		})
 
  	});
  </script>

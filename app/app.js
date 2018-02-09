@@ -4,6 +4,7 @@ var reload = require('reload');
 var io = require('socket.io')();
 
 var users = [];
+var lowerCaseUsers = [];
 var connections = [];
 
 app.set('port', process.env.PORT || 3000);
@@ -28,10 +29,25 @@ io.on('connection', function(socket) {
 	socket.on("disconnect", function(data) {
 		connections.splice(connections.indexOf(socket), 1);
 		users.splice(users.indexOf(socket.username), 1);
+		lowerCaseUsers.splice(lowerCaseUsers.indexOf(socket.username), 1);
 		io.emit("update usernames", users);
 		console.log(socket.id, " disconnected")
 		console.log("Connected: %s sockets connected.", connections.length);
 	})
+
+	//New User:
+
+	socket.on("new user", function(username, fn) {
+		if(lowerCaseUsers.includes(username.toLowerCase())) {
+			socket.emit("username exists")
+		} else {
+			socket.username = username;
+			users.push(username);
+			lowerCaseUsers.push(username.toLowerCase());
+			fn(true);
+			io.emit("update usernames", users);
+		}
+	});
 
 	//Send Message:
 
@@ -66,14 +82,6 @@ io.on('connection', function(socket) {
 	//socket and other sockets connected to our server, will not be
 	//notified of new events.
 
-
-	//New User:
-
-	socket.on("new user", function(data) {
-		socket.username = data;
-		users.push(data);
-		io.emit("update usernames", users);
-	});
 
 });
 
